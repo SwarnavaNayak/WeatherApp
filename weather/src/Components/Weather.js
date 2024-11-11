@@ -1,91 +1,103 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import './Weather.css';
-import { FaSearch,FaWind } from "react-icons/fa";
-import {MdLocationOn} from 'react-icons/md';
-import {WiHumidity} from 'react-icons/wi';
+import { FaSearch, FaWind } from 'react-icons/fa';
+import { MdLocationOn } from 'react-icons/md';
+import { WiHumidity } from 'react-icons/wi';
 
 const Weather = () => {
+  const [city, setCity] = useState('');
+  const [weather, setWeather] = useState(null);
+  const [error, setError] = useState('');
+  const [backgroundImage, setBackgroundImage] = useState('');
 
-    const [city, setCity] = useState('');
-    const [weather, setWeather] = useState();
-    const [error, setError] = useState('');
+  const WEATHER_API_KEY = '5945053d54edcb60aadbcf4aa6396bc7';
+  const PEXELS_API_KEY = '9YIeI45zjS2s3Td8scu4pQbRnaySEnMKAryP8SiuGbeVW2QAJvKsUOP1';
 
-    const API_KEY = "5945053d54edcb60aadbcf4aa6396bc7";
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`;
-
-    function handleOnChange(event) {
-        setCity(event.target.value);
+  const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${WEATHER_API_KEY}`;
+  const fetchWeatherData = async () => {
+    try {
+      const response = await fetch(weatherUrl);
+      const data = await response.json();
+      if (response.ok) {
+        setWeather(data);
+        setError('');
+        fetchBackgroundImage(data.name);
+      } else {
+        setError('City not found. Please enter a valid city name.');
+        setWeather(null);
+      }
+    } catch (err) {
+      setError('Error fetching weather data');
     }
+  };
 
-    async function fetchData() {
-        try {
-            let response = await fetch(url);
-            let output = await response.json();
-            if(response.ok) {
-                setWeather(output);
-                console.log(output);
-                setError('');
-            } else {
-                setError('No data found. Please enter a valid city name.')
-            }
-        }
-        catch (error) {
 
-        }
+  const fetchBackgroundImage = async (cityName) => {
+    const pexelsUrl = `https://api.pexels.com/v1/search?query=${cityName}&per_page=1`;
+    try {
+      const response = await fetch(pexelsUrl, {
+        headers: { Authorization: PEXELS_API_KEY },
+      });
+      const result = await response.json();
+      if (result.photos && result.photos.length > 0) {
+        setBackgroundImage(result.photos[0].src.landscape);
+      }
+    } catch (err) {
+      console.error('Error fetching background image', err);
     }
+  };
+
   return (
-    <div className='container'>
+    <div
+      className='app'
+      style={{ backgroundImage: backgroundImage ? `url(${backgroundImage})` : '' }}
+    >
+      <div className='overlay'></div>
+      <div className='container'>
         <div className='city'>
-            <input type='text' value={city} onChange={handleOnChange} placeholder='Enter any city name'></input>
-            <button onClick={() => fetchData()}>
-                <FaSearch></FaSearch>
-            </button>
+          <input
+            type='text'
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            placeholder='Enter city name'
+          />
+          <button onClick={fetchWeatherData}>
+            <FaSearch />
+          </button>
         </div>
 
-        {
-            error && <p className='error-message'>{error}</p>
-        }
-        {
-            weather && weather.weather &&
-            <div className='content'>
+        {error && <p className='error-message'>{error}</p>}
 
-                <div className='weather-image'>
-                    <img src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`} alt=''></img>
-                    <h3 className='desc'>{weather.weather[0].description}</h3>
-                </div>
-
-                <div className='weather-temp'>
-                    <h2>{weather.main.temp}<span>&deg;C</span></h2>
-                </div>
-
-                <div className='weather-city'>
-                    <div className='location'>
-                        <MdLocationOn></MdLocationOn>
-                    </div>
-                    <p>{weather.name},<span>{weather.sys.country}</span></p>
-                </div>
-
-                <div className='weather-stats'>
-                    <div className='wind'>
-                        <div className='wind-icon'>
-                            <FaWind></FaWind>
-                        </div>
-                        <h3 className='wind-speed'>{weather.wind.speed}<span>Km/h</span></h3>
-                        <h3 className='wind-heading'>Wind Speed</h3>
-                    </div>    
-                    <div className='humidity'>
-                        <div className='humidity-icon'>
-                            <WiHumidity></WiHumidity>
-                        </div>
-                        <h3 className='humidity-percent'>{weather.main.humidity}<span>%</span></h3>
-                        <h3 className='humidity-heading'>Humidity</h3>
-                    </div>
-                </div>
+        {weather && weather.weather && (
+          <div className='content'>
+            <div className='weather-image'>
+              <img
+                src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`}
+                alt={weather.weather[0].description}
+              />
+              <h3 className='desc'>{weather.weather[0].description}</h3>
             </div>
-        }
-
+            <div className='weather-temp'>
+              {weather.main.temp}&deg;C
+            </div>
+            <div className='weather-city'>
+              <MdLocationOn /> {weather.name}, {weather.sys.country}
+            </div>
+            <div className='weather-stats'>
+              <div className='wind'>
+                <FaWind className='wind-icon' />
+                <h3>{weather.wind.speed} Km/h</h3>
+              </div>
+              <div className='humidity'>
+                <WiHumidity className='humidity-icon' />
+                <h3>{weather.main.humidity}%</h3>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default Weather
+export default Weather;
