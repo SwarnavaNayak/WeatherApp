@@ -14,6 +14,7 @@ const Weather = () => {
   const PEXELS_API_KEY = '9YIeI45zjS2s3Td8scu4pQbRnaySEnMKAryP8SiuGbeVW2QAJvKsUOP1';
 
   const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${WEATHER_API_KEY}`;
+  
   const fetchWeatherData = async () => {
     try {
       const response = await fetch(weatherUrl);
@@ -21,7 +22,7 @@ const Weather = () => {
       if (response.ok) {
         setWeather(data);
         setError('');
-        fetchBackgroundImage(data.name);
+        fetchWeatherBackground(data.weather[0].main); // Fetch background image based on weather condition
       } else {
         setError('City not found. Please enter a valid city name.');
         setWeather(null);
@@ -31,9 +32,9 @@ const Weather = () => {
     }
   };
 
-
-  const fetchBackgroundImage = async (cityName) => {
-    const pexelsUrl = `https://api.pexels.com/v1/search?query=${cityName}&per_page=1`;
+  // New function to fetch background image based on the weather condition
+  const fetchWeatherBackground = async (weatherCondition) => {
+    const pexelsUrl = `https://api.pexels.com/v1/search?query=${weatherCondition}&per_page=1`;
     try {
       const response = await fetch(pexelsUrl, {
         headers: { Authorization: PEXELS_API_KEY },
@@ -43,7 +44,7 @@ const Weather = () => {
         setBackgroundImage(result.photos[0].src.landscape);
       }
     } catch (err) {
-      console.error('Error fetching background image', err);
+      console.error('Error fetching background image based on weather condition', err);
     }
   };
 
