@@ -47,4 +47,5 @@ A responsive React application that fetches real-time weather data from OpenWeat
 bash :-
 
 git clone https://github.com/SwarnavaNayak/WeatherApp.git
+
 cd weather-app
