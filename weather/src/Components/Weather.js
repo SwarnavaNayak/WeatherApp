@@ -10,8 +10,9 @@ const Weather = () => {
   const [error, setError] = useState('');
   const [backgroundImage, setBackgroundImage] = useState('');
 
-  const WEATHER_API_KEY = '5945053d54edcb60aadbcf4aa6396bc7';
-  const PEXELS_API_KEY = '9YIeI45zjS2s3Td8scu4pQbRnaySEnMKAryP8SiuGbeVW2QAJvKsUOP1';
+  const WEATHER_API_KEY = process.env.REACT_APP_WEATHER_API_KEY;
+  const PEXELS_API_KEY = process.env.REACT_APP_PEXELS_API_KEY;
+
 
   const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${WEATHER_API_KEY}`;
   
