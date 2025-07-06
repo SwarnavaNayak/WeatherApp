@@ -6,7 +6,7 @@ A responsive React application that fetches real-time weather data from OpenWeat
 
  📸 Live Preview
 
-> https://weather-app-tau-opal.vercel.app/
+> https://weather-app-swarnava.vercel.app/
 
 ---
 
